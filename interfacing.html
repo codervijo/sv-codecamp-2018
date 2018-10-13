@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=1024, user-scalable=no">
+
+  <title>Interfacing</title>
+
+  <!-- Required stylesheet -->
+  <link rel="stylesheet" media="screen" href="core/deck.core.css">
+
+  <!-- Extension CSS files go here. Remove or add as needed. -->
+  <link rel="stylesheet" media="screen" href="extensions/goto/deck.goto.css">
+  <link rel="stylesheet" media="screen" href="extensions/menu/deck.menu.css">
+  <link rel="stylesheet" media="screen" href="extensions/navigation/deck.navigation.css">
+  <link rel="stylesheet" media="screen" href="extensions/status/deck.status.css">
+  <link rel="stylesheet" media="screen" href="extensions/scale/deck.scale.css">
+
+  <!-- Style theme. More available in /themes/style/ or create your own. -->
+  <link rel="stylesheet" media="screen" href="themes/style/swiss.css">
+
+  <!-- Transition theme. More available in /themes/transition/ or create your own. -->
+  <link rel="stylesheet" media="screen" href="themes/transition/horizontal-slide.css">
+
+  <!-- Basic black and white print styles -->
+  <link rel="stylesheet" media="print" href="core/print.css">
+
+  <!-- Required Modernizr file -->
+  <script src="modernizr.custom.js"></script>
+</head>
+<body>
+  <div class="deck-container">
+
+    <section class="slide">
+      <h2>What is this talk about?</h2>
+      <ul>
+          <li> Interfacing scripting languages with C</li>
+          <li> Lua &amp; Ruby </li>
+          <li> Focus on Lua side</li>
+          <li> Lua for programmers</li>
+          <li> Assuming C programming experience</li>
+          <li> Only an introduction to interfacing techniques</li>
+          <li> Examples tested on Lua 5.2.4 Ubuntu 16.04 </li>
+          <li> Slides at <a href="http://blog.plaira.io">Plaira Blogs: </a>blog.plaira.io</li>
+      </ul>
+    </section>
+
+    <section class="slide">
+      <h2>Why?</h2>
+      <ul>
+          <li>Combine best of both worlds
+          <ul>
+              <li> Scripting: Ease of development</li>
+              <li> C : Powerful, OS, HW</li>
+              </ul></li>
+          <li> So many languages</li>
+          <li> Many Potential Uses</li>
+      </ul>
+    </section>
+      
+    <section class="slide">
+      <h2>My interest</h2>
+      <ul>
+          <li> C and Golang experience</li>
+          <li> Raw socket in Lua</li>
+          <li> system/exec == Hammer</li>
+          <li> New avenues</li>
+      </ul>
+    </section>
+
+    <!-- Begin slides. Just make elements with a class of slide. -->
+
+    <section class="slide">
+      <h2>Why Lua?</h2>
+        <li> Small</li>
+        <li> Embeddable</li>
+        <li> C based syntax</li>
+        <li> Written in C</li>
+        <li> C API</li>
+    </section>
+
+    <section class="slide">
+      <h2>Introduction to Lua</h2>
+        <li> C based syntax</li>
+        <li> LuaJit claims to be fastest scripting language</li>
+        <li> Dynamically typed</li>
+        <li> Garbage collected</li>
+        <li> Basic types: <span style="color:red;">nil</span>, <span style="color:red;">boolean</span>, <span style="color:red;">number</span>, <span style="color:red;">string</span>, <br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:red;">userdata</span>, <span style="color:red;">function</span>, <span style="color:red;">thread</span>, and <span style="color:red;">table</span></li>
+    </section>
+
+    <section class="slide">
+      <h2>Specialties of Lua</h2>
+        <li> Comment starts with --</li>
+        <li> First class Functions</li>
+        <li> Array is not a basic type</li>
+        <li> Support for package</li>
+        <li> Table : One &amp; Only Data structure</li>
+        <li> userdata : basic type for C data</li>
+        <li> Strings in Lua are not NULL-terminated</li>
+    </section>
+
+    <section class="slide">
+      <h2>Superpowers of Lua</h2>
+      <ul>
+          <li> Multi-paradigm</li>
+          <li> Extension Language</li>
+          <li> Extensible Language</li>
+          <li> Embeddable, efficient, modern scripting language </li>
+      </ul>
+    </section>
+
+    <section class="slide">
+      <h2>Hello world</h2>
+       <li class="slide">
+           print 'hello, world!'<br>
+           --log ('hello, world!')
+       </li>
+       <li class="slide">
+            for i=1,100 do<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if i % 3 == 0 and i % 5 == 0 then<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;     io.write("FizzBuzz\n");<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;elseif i % 3 == 0 then<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;     io.write("Fizz\n");<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;elseif i % 5 == 0 then<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;     io.write("Buzz\n");<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;else<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;     print(i);<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;end<br>
+
+       </li>
+    </section>
+
+    <section class="slide">
+      <h2>Lua Control Structures</h2>
+      <ul>
+          <li> Small, conventional set : if, while, repeat, for</li>
+          <li> Ends with explicit end or until</li>
+          <li> break &amp; return should be at end of block</li>
+          <li> No next or continue</li>
+          <li> No switch/case</li>
+          <li> No ternary operator</li>
+      </ul>
+    </section>
+
+    <section class="slide">
+      <h2>Lua Examples</h2>
+      <ul>
+          <li class="slide"><code>for var=exp1,exp2,exp3 do something end</code><br>
+              <code>for i=10,1,-1 do print(i) end</code></li>
+          <li class="slide"><code>-- print all values of array `a' <br>
+                    for i,v in ipairs(a) do print(v) end</code></li>
+          <li class="slide"><code>-- print all keys of table `t'<br>
+                    for k in pairs(t) do print(k) end</code></li>
+          <li class="slide"><code>local i = 1 <br>
+                                  while a[i] do<br>
+                                  &nbsp;&nbsp;&nbsp;&nbsp;if a[i] == v then break end<br>
+                                  &nbsp;&nbsp;&nbsp;&nbsp;i = i + 1<br>
+                                  end</code></li>
+      </ul>
+    </section>
+
+    <section class="slide">
+      <h2>Lua Functions</h2>
+      <ul>
+          <li>Can be defined in Lua or C</li>
+          <li><code>function f(a, b) return a or b end</code></li>
+          <li>Multiple return values</li>
+          <li>Variable Number of arguments</li>
+          <li>First class</li>
+          <li>Lexical scoping, Closures</li>
+      </ul>
+    </section>
+      
+    <section class="slide">
+      <h2>Lua Function Examples</h2>
+      <ul>
+          <li class="slide"><code>function f(a, b) return a or b end</code></li>
+          <li class="slide"><table><tr><th>CALL</th><th style="padding-left:10%" width="500">PARAMETERS                  </th></tr>
+              <tr class="slide"><td>f(3)</td>        <td style="padding-left:10%">a=3, b=nil</td></tr>
+              <tr class="slide"><td>f(3, 4)</td>     <td style="padding-left:10%">a=3, b=4</td></tr>
+              <tr class="slide"><td>f(3, 4, 5)</td>  <td style="padding-left:10%">a=3, b=4   (5 is discarded)</td></tr></table></li>
+          <li class="slide"><code>s, e = string.find("hello Lua users", "Lua")</code></li>
+          <li class="slide"><code>rename({old="temp.lua", new="temp1.lua"})</code></li>
+          <li class="slide"><code>function fwrite (fmt, ...)<br>
+                                  &nbsp;&nbsp;return io.write(string.format(fmt,<br>
+                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;unpack(arg)))<br>
+                                  end</code></li>
+      </ul>
+    </section>
+      
+    <section class="slide">
+      <h2>More on Lua Functions</h2>
+      <ul>
+          <li class="slide">Function is anonymous</li>
+          <li class="slide"><code>  a = {p = print} </code>
+              <li class="slide"><code> a.p("Hello World")&nbsp;--> Hello World</code></li>
+              <li class="slide"><code> print = math.sin&nbsp;&nbsp;&nbsp;-- `print' is sine</code></li>
+              <li class="slide"><code> a.p(print(1))&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--> 0.84147</code></li>
+              <li class="slide"><code> sin = a.p&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-- `sin' is now print</code></li>
+              <li class="slide"><code> sin(10, 20)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--> 10      20</code></li>
+      </ul>
+    </section>
+    
+    <section class="slide">
+      <h2>Lua Function Example </h2>
+          <ul><code>
+              local statefns = {<br>
+              &nbsp;&nbsp;   start&nbsp;  = do_start_state,<br>
+              &nbsp;&nbsp;   step1&nbsp;  = do_step1_state,<br>
+              &nbsp;&nbsp;   step2&nbsp;  = do_step2_state,<br>
+              &nbsp;&nbsp;   finish = do_finish_state<br>
+              } <br>
+              -- init dets<br>
+              while true<br>
+              do<br>
+              &nbsp;&nbsp;   if (dets.state == "end) then break<br>
+              &nbsp;&nbsp;   else<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;     statefns[dets.state](dets)<br>
+              &nbsp;&nbsp;   end<br>
+              done<br>
+              </code></ul>
+    </section>
+
+    <section class="slide">
+      <h2>Closures</h2>
+      <ul>
+          <code>
+                function newCounter ()<br>
+                &nbsp;&nbsp;local i = 0<br>
+                &nbsp;&nbsp;return function ()&nbsp; -- anonymous function<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;i = i + 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; --  upvalue<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return i<br>
+                &nbsp;&nbsp;end<br>
+                end<br>
+
+                c1 = newCounter()<br>
+                print(c1())  --> 1<br>
+                print(c1())  --> 2<br>
+              
+          </code>
+      </ul>
+    </section>
+      
+    <section class="slide">
+      <h2>Lua Tables</h2>
+      <ul>
+          <li> Only Data Structure</li>
+          <li> Are associative arrays</li>
+          <li> Arrays are special cases</li>
+          <li> Used for packages</li>
+          <li> Used for object-oriented programming</li>
+          <li> <code>$a[1000000000]=1;</code>in perl vs Lua <code>a={[1000000000]=1}</code> </li>
+      </ul>
+    </section>
+      
+    <section class="slide">
+      <h2>Useful Lua Idioms</h2>
+      <ul>
+          <li class="slide"><pre style="width:1200px;height:100%">local function test(x)
+    x = x or "idunno"
+    -- rather than if x == false or x == nil then x = "idunno" end
+    print(x == "yes" and "YES!" or x)
+    -- rather than if x == "yes" then print("YES!") else print(x) end
+end</pre></li>
+          <li class="slide"><code>Clone a small table t : u = {unpack(t)}</code></li>
+          <li class="slide"><code>Determine if a table t is empty: if next(t) == nil then ..</code></li>
+          <li class="slide"><code>To append to an array: t[#t+1] = 1</code></li>
+      </ul>
+    </section>     
+      
+    <section class="slide">
+      <h2>Lua Packages</h2>
+      <ul>
+          <li class="slide"> Implemented using tables</li>
+          <li class="slide"> LUA_PATH="?;?.lua;c:\windows\?;/usr/local/lua/?/?.lua"</li>
+          <li class="slide"> require()</li>
+          <li class="slide"> package.path = package.path .. ';my_path/?/init.lua'<br>
+                             package.cpath = package.cpath .. ';my_path/?.so'</li>
+          <li class="slide"> Return table from file for privacy</li>
+          <li class="slide"> Example here : https://www.lua.org/pil/15.2.html</li>
+      </ul>
+    </section>
+
+    <section class="slide">
+      <h2>Lua Internals</h2>
+      <ul>
+          <li> Hand-written scanner, recursive descent parser</li>
+          <li> Register based Virtual Machine</li>
+          <li> Emits instructions "on the fly"</li>
+          <li> Internalizes strings using hash table</li>
+      </ul> 
+    </section>
+      
+    <section class="slide">
+      <h2>Lua Table Internals</h2>
+      <ul>
+          <li> Array is a special case of tables</li>
+          <li> Array starts at 1</li>
+          <br><br>
+          <h5> Lua Table implementation </h5>
+          <img src="./A-Lua-table.png" />
+      </ul> 
+    </section>  
+
+    <section class="slide">
+      <h2> Lua &amp; C - Introduction</h2>
+         <li> Lua as library, with control by C</li>
+         <li> Lua calls to C library</li>
+         <li> Both  use Lua C API</li>
+         <li> C API allows C code to interact with Lua</li>
+         <li> Challenge 1: dynamic vs static type system</li>
+         <li> Challenge 2: automatic vs manual memory management</li>
+    </section>
+
+     <section class="slide">
+      <h2> Stack between Lua &amp; C </h2>
+         <li> Stack to exchange values between Lua and C</li>
+         <li> Functions to push values on to stack</li>
+         <li> Always check if there is space on stack:
+             <ul>
+                 <li>int lua_checkstack (lua_State *L, int sz);</li>
+             </ul>
+         </li>
+    </section>
+
+    <section class="slide">
+        <h2> Lua C API</h2>
+            <li> One push function for each Lua type :
+             <ul>
+                 <li>void lua_pushnil (lua_State *L);</li>
+                 <li>void lua_pushboolean (lua_State *L, int bool);</li>
+                 <li>void lua_pushnumber (lua_State *L, double n);</li>
+                 <li>void lua_pushlstring (lua_State *L, const char *s,
+                                           size_t length);</li>
+                 <li>void lua_pushstring (lua_State *L, const char *s); </li>
+             </ul>
+         </li>
+    </section>
+      
+    <section class="slide">
+      <h2> Lua C API</h2>
+         <li> Lua library defines no global variables at all </li>
+         <li> Lua library keeps all its state in  <code>lua_State</code></li>
+         <li> Pointer to this structure is passed to all functions inside Lua</li>
+         <li> Lua is reentrant and ready to be used in multithreaded code</li>
+         <li> Provides C Functions :
+            <ul>
+                <li> to read and write Lua global variables</li>
+                <li> to call Lua functions</li>
+                <li> to run pieces of Lua code</li>
+                <li> to register C functions to be called by Lua </li>
+            </ul>
+         </li>
+    </section>
+
+    <section class="slide">
+      <h2> Embedding Lua in C</h2>
+         <ul>
+            <li> Lua as a configuration language</li>
+            <li class="slide"><code>-- configuration file for program `pp'<br>
+                    -- define window size<br>
+                    width = 200<br>
+                    height = 300</code></li>
+             <li class="slide"> Use the Lua C API to parse this file<br><code>
+                        lua_getglobal(L, "width");<br>
+                        lua_getglobal(L, "height");<br>
+                        if (!lua_isnumber(L, -2))<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;error(L, "`width' should be a number\n");<br>
+                        if (!lua_isnumber(L, -1))<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;error(L, "`height' should be a number\n");<br>
+                        *width = (int)lua_tonumber(L, -2);<br>
+                        *height = (int)lua_tonumber(L, -1);<br>
+                    </code></li>
+         </ul>
+    </section>
+      
+    <section class="slide">
+      <h2> Calling C from Lua</h2>
+        <ul>
+            <li> Lua can NOT call <strong>any</strong> C function</li>
+            <li> Application can register new C functions into Lua</li>
+            <li> C function must follow a protocol</li>
+            <li> Each function has its own private local stack</li>
+            <li> First argument will always be at index 1 of this local stack</li>
+            <li> Other side of stack : Query</li>
+            <li> To refer to elements in the stack, the API uses indices</li>
+            <li> To get a value from the stack, there are the lua_to* functions:
+                <ul>
+                    <li>int            lua_toboolean (lua_State *L, int index);</li>
+                    <li>double         lua_tonumber (lua_State *L, int index);</li>
+                    <li>const char    *lua_tostring (lua_State *L, int index);</li>
+                    <li>size_t         lua_strlen (lua_State *L, int index);</li>
+                </ul>
+            </li>
+        </ul>
+    </section>
+
+    <section class="slide">
+      <h2>Related technologies</h2>
+        <li> SWIG</li>
+        <li> Foreign Function Interface </li>
+        <li> Not mentioned: system/exec </li>
+    </section>
+    
+    <section class="slide">
+        <h2>SWIG</h2>
+        <li><span style="color:red;">swig -python -module arith arith.c</span><br>
+               SWIG creates two new files, arith_wrap.c and arith_wrap.doc.
+            </li>
+        <li><span style="color:red;">gcc -I/usr/include/python1.5 -c arith.c arith_wrap.c</span><br>
+              The object files arith.o and arith_wrap.o should now be combined to produced a shared object called arith.so:
+            </li>
+        <li><span style="color:red;">ld -shared -o arith.so arith.o arith_wrap.o</span><br>
+              If everything goes well, we will have a file called arith.so in our current directory. 
+            </li>
+        <br>
+        <pre>Here is a sample interaction using the arith module:
+            <code>
+            import arith
+            >>>arith.add(10, 20)
+            30
+            >>>arith.add(10, -10)
+            0</code></pre>
+    </section>
+
+    <section class="slide">
+      <h2>Quick Introduction to Ruby</h2>
+         <li> Lots of resources online</li>
+         <li> Popularized by Ruby-on-Rails framework</li>
+         <li> (Purely) Object-oriented scripting language</li>
+         <li> Variables are dynamically typed</li>
+         <li> First class closures (blocks)</li>
+         <li> Meta-programming</li>
+    </section>
+      
+    <section class="slide">
+      <h2>Ruby : Details </h2>
+         <li> Everything is an object including nil, Class</li>
+         <li> Variables are references to objects</li>
+         <li> Method naming conventions</li>
+         <li> 3 levels of access control for methods : 
+             <ol><li><code>public</code></li>
+                 <li><code>protected</code></li>
+                 <li><code>private</code></li>
+             </ol>
+         </li>
+         <li> You can write Ruby programs direcly in C</li>
+         <li> Type of all Ruby variables in C is <code>VALUE</code></li>
+         <li> We can use the C version of the code in Ruby simply by require-ing it dynamically at runtime</li>
+    </section>
+ 
+    <section class="slide">
+      <h2>Ruby Control Structures </h2>
+             <li><span style="color:red;">if</span> &lt;condition&gt;<br>
+             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;body&gt; <br>
+             &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:red;">elsif</span> &lt;condition&gt;<br>
+             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;body&gt;<br>
+             &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:red;">end</span></li>
+             <li><span style="color:red;">while</span> &lt;condition&gt;<br>
+             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;body&gt;<br>
+             &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:red;">end</span></li>
+             <li><span style="color:red;">until</span> &lt;condition&gt;<br>
+             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;body&gt;<br>
+             &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:red;">end</span></li>
+             <li>&lt;expression&gt;&nbsp;<span style="color:red;">if</span>&nbsp;&lt;condition&gt;</li>
+             <li>&lt;expression&gt;&nbsp;<span style="color:red;">unless</span>&nbsp;&lt;condition&gt;</li>
+             <li>&lt;expression&gt;&nbsp;<span style="color:red;">while</span>&nbsp;&lt;condition&gt;</li>
+             <li>&lt;expression&gt;&nbsp;<span style="color:red;">until</span>&nbsp;&lt;condition&gt;</li> 
+    </section>    
+
+    <section class="slide">
+      <h2>Ruby Classes</h2>
+        <pre style="width:1200px;height:100%">
+        class SavingsAccount <span style="color:red;">&lt; Account</span> <span style="color:blue;"># inheritance</span>
+        &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;"># Constructor. Used when SavingsAccount.new is called</span>
+        &nbsp;&nbsp;&nbsp;&nbsp;def initialize(starting_balance=0) <span style="color:blue;"># Optional argument</span>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:red;">@balance</span> = starting_balance
+        &nbsp;&nbsp;&nbsp;&nbsp;end
+        &nbsp;&nbsp;&nbsp;&nbsp;def balance <span style="color:blue;"># instance method</span>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:red;">@balance</span> <span style="color:blue;"># instance var. visible only to this object</span>
+        &nbsp;&nbsp;&nbsp;&nbsp;end
+        &nbsp;&nbsp;&nbsp;&nbsp;def balance=(new_amount) <span style="color:blue;"># like setter</span>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:red;">@balance</span> = new_amount
+        &nbsp;&nbsp;&nbsp;&nbsp;end
+        &nbsp;&nbsp;&nbsp;&nbsp;def deposit(amount)
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:red;">@balance</span> += amount
+        &nbsp;&nbsp;&nbsp;&nbsp;end
+        &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:red;">@@bank_name</span> = "MyBank"  <span style="color:blue;"># class variable</span>
+        &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;"># Class Method</span>
+        &nbsp;&nbsp;&nbsp;&nbsp;def <span style="color:red;">self</span>.bankname
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:red;">@@bank_name</span>
+        &nbsp;&nbsp;&nbsp;&nbsp;end
+        end
+        </pre>
+    </section>
+      
+    <section class="slide">
+      <h2>Ruby &amp; C</h2>
+         <li class="slide"> Run arbitrary Ruby expression (C version of eval)
+             <pre style="font-size:0.8em;">rb_eval_string("anObject.each{|x| x.clearFlag }");</pre>
+         </li>
+        <li class="slide"> Type of Ruby variables is <span style="color:blue;">VALUE</span>, a pointer to a Ruby object</li>
+        <li class="slide"> Ruby object is structure that contains instance variables</li>
+        <li class="slide"> Object  contains a table of the methods defined for that class</li>
+    </section>
+
+    <section class="slide">
+      <h2>VALUE</h2>
+         <li> You can't have a VALUE that points to an arbitrary structure</li>
+         <li> It is a pointer to one of the defined Ruby object structures</li>
+         <li> Except: Immediate values are not pointers</li>
+         <li> Fixnum, Symbol, true, false, and nil are stored directly in VALUE</li>
+         <li> There are several useful conversion macros</li>
+         <li> Every C function callable from Ruby must return a VALUE</li>
+    </section>
+        
+    <section class="slide">
+        <h4 id="cdatatypewrapping">C Datatype Wrapping</h4>
+        <dl>
+            <dt><code><span class="functionreturntype">VALUE</span> <span class="functionname">Data_Wrap_Struct</span>(<span class="functionparams">VALUE class, void (*mark)(), void (*free)(), void *ptr</span>)</code></dt>
+            <dd>Wraps the given C datatype <em>ptr</em>, registers the two garbage collection routines (see below), and returns a VALUE pointer to a genuine Ruby object. The C type of the resulting object is <code>T_DATA</code> and its Ruby class is <em>class</em>.</dd>
+
+            <dt><code><span class="functionreturntype">VALUE</span> <span class="functionname">Data_Make_Struct</span>(<span class="functionparams">VALUE class, <em>c-type</em>, void (*mark)(), void (*free)(), <em>c-type *</em></span>)</code></dt>
+            <dd>Allocates a structure of the indicated type first, then proceeds as <code>Data_Wrap_Struct</code>. <em>c-type</em> is the name of the C datatype that you're wrapping, not a variable of that type.</dd>
+
+            <dt><code><span class="functionreturntype"></span> <span class="functionname">Data_Get_Struct</span>(<span class="functionparams">VALUE obj,<em>c-type</em>,<em>c-type *</em></span>)</code></dt>
+            <dd>Returns the original pointer. This macro is a type-safe wrapper around the macro <code>DATA_PTR(obj)</code>, which evaluates the pointer.</dd>
+        </dl>
+    </section>  
+      
+    <section class="slide">
+      <h2>Next</h2>
+         <li> Make some configuration files lua-based</li>
+         <li> wget/exec script on event</li>
+         <li> yacc connections to ruby and lua</li>
+         <li> More kernel and system call interfaces with Lua/Ruby</li>
+    </section>
+ 
+    <section class="slide">
+      <h1>Q &amp; A</h1>
+    </section>     
+      
+    <section class="slide">
+      <h2>Resources</h2>
+        <li style="font-size: .6em">https://www.researchgate.net/publication/281823578_Introduction_to_Ruby</li>
+        <li style="font-size: .6em">https://www.slideshare.net/henrythe10th/code-for-startup-mvp-ruby-on-rails-session-2</li>
+        <li style="font-size: .6em">http://phrogz.net/programmingruby/ext_ruby.html</li>
+        <li style="font-size: .6em">https://silverhammermba.github.io/emberb/c/</li>
+        <li style="font-size: .6em">https://www.lua.org/doc/jucs05.pdf</li>
+        <li style="font-size: .6em">https://www.lua.org/ftp/refman-5.0.pdf</li>
+        <li style="font-size: .6em">https://www.luaforge.net/docman/83/98/ANoFrillsIntroToLua51VMInstructions.pdf</li>
+        <li style="font-size: .6em"><a href="http://lamill.io">LaMill Software Services</a></li>
+    </section>
+    <!-- End slides. -->
+
+    <!-- Begin extension snippets. Add or remove as needed. -->
+
+    <!-- deck.navigation snippet -->
+    <div aria-role="navigation">
+      <a href="#" class="deck-prev-link" title="Previous">&#8592;</a>
+      <a href="#" class="deck-next-link" title="Next">&#8594;</a>
+    </div>
+
+    <!-- deck.status snippet -->
+    <p class="deck-status" aria-role="status">
+      <span class="deck-status-current"></span>
+      /
+      <span class="deck-status-total"></span>
+    </p>
+
+    <!-- deck.goto snippet -->
+    <form action="." method="get" class="goto-form">
+      <label for="goto-slide">Go to slide:</label>
+      <input type="text" name="slidenum" id="goto-slide" list="goto-datalist">
+      <datalist id="goto-datalist"></datalist>
+      <input type="submit" value="Go">
+    </form>
+
+    <!-- End extension snippets. -->
+  </div>
+
+<!-- Required JS files. -->
+<script src="jquery.min.js"></script>
+<script src="core/deck.core.js"></script>
+
+<!-- Extension JS files. Add or remove as needed. -->
+<script src="extensions/menu/deck.menu.js"></script>
+<script src="extensions/goto/deck.goto.js"></script>
+<script src="extensions/status/deck.status.js"></script>
+<script src="extensions/navigation/deck.navigation.js"></script>
+<script src="extensions/scale/deck.scale.js"></script>
+
+<!-- Initialize the deck. You can put this in an external file if desired. -->
+<script>
+  $(function() {
+    $.deck('.slide');
+  });
+</script>
+</body>
+</html>

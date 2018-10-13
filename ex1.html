@@ -1,0 +1,22 @@
+      <h2>Ruby Classes</h2>
+        class SavingsAccount &lt; Account <span style="color:blue;"># inheritance</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;"># Constructor. Used when SavingsAccount.new is called</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;def initialize(starting_balance=0) <span style="color:blue;"># Optional argument</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;@balance = starting_balance<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;end<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;def balance <span style="color:blue;"># instance method</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;@balance <span style="color:blue;"># instance var. visible only to this object</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;end<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;def balance=(new_amount) <span style="color:blue;"># like setter</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;@balance = new_amount<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;end<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;def deposit(amount)<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;@balance += amount<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;end<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;@@bank_name = "MyBank"  <span style="color:blue;"># class variable</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;"># Class Method</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;def self.bankname<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;@@bank_name<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;end<br>
+        end<br>
+        
